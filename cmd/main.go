@@ -15,6 +15,12 @@ func main() {
 		})
 	})
 
+  // Route สำหรับดึงข้อมูลสินค้าทั้งหมด
+	r.GET("/products", handlers.GetProducts)
+
+	// Route สำหรับดึงข้อมูลสินค้าตาม product_id
+	r.GET("/products/:product_id", handlers.GetProductByID)
+
 	//* routes สำหรับ authentication
 	authGroup := r.Group("/auth")
 	{
@@ -25,3 +31,4 @@ func main() {
 	//* port 8080
 	r.Run(":8080")
 }
+
