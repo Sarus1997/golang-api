@@ -24,12 +24,16 @@ func main() {
 
 	//* Route สำหรับดึงข้อมูลสินค้าทั้งหมด
 	r.GET("/products", handlers.GetProducts)
+  
 	//* Route สำหรับดึงข้อมูลสินค้าตาม product_id
 	r.GET("/products/:product_id", handlers.GetProductByID)
 
-  //* test
+  //* test ทดสอบ
   r.GET("/test", handlers.GetTest)
-  
+  r.POST("/test", handlers.PostTest)
+  r.PUT("/test/:id", handlers.PutTest)
+  r.DELETE("/test/:id", handlers.DeleteTest)
+
 	//* routes สำหรับ authentication
 	authGroup := r.Group("/auth")
 	{
