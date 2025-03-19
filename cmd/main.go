@@ -1,11 +1,18 @@
 package main
 
 import (
+	"github.com/Sarus1997/golang-api/config"
 	"github.com/Sarus1997/golang-api/internal/handlers"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	//* โหลด environment variables
+	config.LoadEnv()
+
+	//* เชื่อมต่อ Database
+	config.InitDB()
+
 	//* สร้าง Gin router
 	r := gin.Default()
 
@@ -15,10 +22,10 @@ func main() {
 		})
 	})
 
-  // Route สำหรับดึงข้อมูลสินค้าทั้งหมด
+	//* Route สำหรับดึงข้อมูลสินค้าทั้งหมด
 	r.GET("/products", handlers.GetProducts)
 
-	// Route สำหรับดึงข้อมูลสินค้าตาม product_id
+	//* Route สำหรับดึงข้อมูลสินค้าตาม product_id
 	r.GET("/products/:product_id", handlers.GetProductByID)
 
 	//* routes สำหรับ authentication
@@ -31,4 +38,3 @@ func main() {
 	//* port 8080
 	r.Run(":8080")
 }
-

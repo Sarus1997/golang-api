@@ -10,31 +10,33 @@ import (
 	"gorm.io/gorm"
 )
 
+//* ตัวแปร DB ใช้เก็บ connection ของ database
 var DB *gorm.DB
 
-// โหลด .env และเชื่อมต่อฐานข้อมูล
-func InitDatabase() {
-	// โหลดไฟล์ .env
-	err := godotenv.Load()
-	if err != nil {
+func LoadEnv() {
+	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
+}
 
-	// รับค่าจาก .env
-	dbHost := os.Getenv("DB_HOST")
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+func InitDB() {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", 
+		os.Getenv("DB_USER"), 
+		os.Getenv("DB_PASSWORD"), 
+		os.Getenv("DB_HOST"), 
+		os.Getenv("DB_NAME"))
 
-	// สร้าง DSN (Data Source Name) สำหรับ MySQL
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbName)
-
-	// เชื่อมต่อฐานข้อมูล MySQL
-	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	var err error
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("failed to connect to MySQL", err)
+		log.Fatal("❌ Failed to connect to database:", err)
 	}
 
-	// เก็บ connection ไว้ในตัวแปร global
-	DB = database
+	sqlDB, _ := DB.DB()
+	if err := sqlDB.Ping(); err != nil {
+		log.Fatal("❌ Database not responding:", err)
+	}
+
+	fmt.Println("✅ Database connected successfully")
 }
+
