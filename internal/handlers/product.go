@@ -11,20 +11,17 @@ import (
 
 // ฟังก์ชันสำหรับดึงข้อมูลสินค้า
 func GetProducts(c *gin.Context) {
-	if config.DB == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection is nil"})
-		return
-	}
-
 	var products []models.Product
+
+	// ดึงข้อมูลทั้งหมดจากตาราง product_
 	if err := config.DB.Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching products"})
 		return
 	}
 
+	// ส่งข้อมูลสินค้าให้กับผู้ใช้
 	c.JSON(http.StatusOK, gin.H{"products": products})
 }
-
 
 // ฟังก์ชันสำหรับดึงข้อมูลสินค้าตาม product_id
 func GetProductByID(c *gin.Context) {

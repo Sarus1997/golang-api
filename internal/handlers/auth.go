@@ -5,7 +5,6 @@ import (
 
 	"github.com/Sarus1997/golang-api/config"
 	"github.com/Sarus1997/golang-api/models"
-
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -19,8 +18,12 @@ func Register(c *gin.Context) {
 	}
 
 	// เข้ารหัสรหัสผ่านก่อนบันทึก
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	user.Password = string(hashedPassword)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error hashing password"})
+		return
+	}
+	user.PasswordHash = string(hashedPassword)
 
 	// สร้างผู้ใช้ในฐานข้อมูล
 	if err := config.DB.Create(&user).Error; err != nil {
@@ -33,7 +36,11 @@ func Register(c *gin.Context) {
 
 // ฟังก์ชันสำหรับการเข้าสู่ระบบ
 func Login(c *gin.Context) {
-	var loginData models.User
+	var loginData struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
 	if err := c.ShouldBindJSON(&loginData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
@@ -47,7 +54,7 @@ func Login(c *gin.Context) {
 	}
 
 	// ตรวจสอบรหัสผ่าน
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginData.Password))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
