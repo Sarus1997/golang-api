@@ -33,3 +33,16 @@ govulncheck ./...
   go run secret.go
 
 ```
+
+### Example Register
+
+```bash
+{
+  "username": "test1234",
+  "email": "test123@gmail.com",
+  "password_hash": "test@1234",
+  "f_name": "Test",
+  "l_name": "Last",
+  "profile_picture": "www.123.com"
+}
+```
